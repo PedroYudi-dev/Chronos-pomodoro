@@ -1,0 +1,17 @@
+.final{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.6rem;
+}
+.final a{
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    text-decoration: none
+}
+.final a:hover{
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    text-decoration: underline
+}
