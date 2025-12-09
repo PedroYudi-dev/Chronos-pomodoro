@@ -3,6 +3,7 @@ import type { TaskStateModel } from "./Models/TaskStateModel";
 import "./styles/global.css"
 import "./styles/theme.css"
 import { Home } from "./pages/Home";
+import { TaskContextProvaider } from "./contexts/TaskContext";
 
 const initialState: TaskStateModel = {
     task: [],
@@ -23,7 +24,9 @@ export default function App(){
 
     return (
       <>
-        <Home state={state} setState={setState}/>
+        <TaskContextProvaider >
+          <Home/>  
+        </TaskContextProvaider>
       </>
     );
 }
