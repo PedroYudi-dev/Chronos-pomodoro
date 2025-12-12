@@ -1,7 +1,7 @@
 import DefaultInput from "../DefaultInput";
 import Cycles from "../Cycles";
 import DefaultButton from "../DefaultButton";
-import { PlayCircleIcon } from "lucide-react";
+import { PlayCircleIcon, StopCircleIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import { Snackbar, type AlertColor } from "@mui/material";
 import { Alert } from "../Alert";
@@ -74,6 +74,18 @@ export default function MainForm() {
     if (reason === "clickaway") return;
     setOpenSnack(false);
   };
+
+  const handleInterruptTask = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>{
+    e.preventDefault()
+    setState((prevState) => {
+      return {
+        ...prevState,
+        activeTask: null,
+        secondsRemaining: 0,
+        formattedSecondsRemaining: "00:00",
+      };
+    });
+  }
   
   return (
     <form onSubmit={handleStartNewTask} className="form">
@@ -86,6 +98,7 @@ export default function MainForm() {
           value={taskName}
           onChange={(e) => setTaskName(e.target.value)}
           ref={taskNameInput}
+          disabled={!!state.activeTask}
         />
       </div>
 
@@ -98,10 +111,27 @@ export default function MainForm() {
           <Cycles />
         </div>
       )}
-      
 
       <div className="formRow">
-        <DefaultButton icon={<PlayCircleIcon />} />
+        {!state.activeTask ? (
+          <DefaultButton
+            arial-label="Iniciar nova tarefa"
+            title="Iniciar"
+            type="submit"
+            icon={<PlayCircleIcon />}
+            // key="startTask"
+          />
+        ) : (
+          <DefaultButton
+            arial-label="Interromper tarefa em andamento"
+            title="andamento"
+            type="button"
+            color="red"
+            icon={<StopCircleIcon />}
+            onClick={handleInterruptTask}
+            // key="stopTask"
+          />
+        )}
       </div>
       <Snackbar
         open={openSnack}
