@@ -9,10 +9,10 @@ import type { TaskModel } from "../../Models/TaskModel";
 import { useTaskContext } from "../../contexts/TaskContext/useTaskContext";
 import { getNextCycle } from "../../Utils/getNextCycle";
 import { getNextCycleType } from "../../Utils/getNextCycleType";
-import { formartSecondsToMinutes } from "../../Utils/formtSecondsToMinutes";
+import { TaskActionType } from "../../contexts/TaskContext/taskActions";
 
 export default function MainForm() {
-  const {state, setState} = useTaskContext()
+  const { state, dispachTask } = useTaskContext();
   const [taskName, setTaskName] = useState("");
   const taskNameInput = useRef<HTMLInputElement>(null)
   const [openSnack, setOpenSnack] = useState(false);
@@ -35,7 +35,8 @@ export default function MainForm() {
       setSnackSeverity("error");
       setOpenSnack(true);
       return;
-    } //else{
+    }
+     //else{
     //     setSnackMessage("Sua tarefa foi adcionada!.");
     //     setSnackSeverity("success");
     //     setOpenSnack(true);
@@ -52,22 +53,7 @@ export default function MainForm() {
       duration: state.config[nextCycleType],
       type: nextCycleType,
     };
-
-    const secondsRemaining =  newTask.duration * 60;
-    const timeFormatted = formartSecondsToMinutes(secondsRemaining)
-    // const formattedSecondsRemaining; = 
-
-    setState(prevState => {
-      return {
-        ...prevState,
-        config: { ...prevState.config },
-        activeTask: newTask,
-        currentCycle: nextCycle,
-        secondsRemaining,
-        formattedSecondsRemaining: timeFormatted,
-        task: [...prevState.task, newTask],
-      };
-    })
+    dispachTask({type: TaskActionType.START_TASK, payload: newTask})
   };
 
   const handleCloseSnack = (event: unknown, reason: string) => {
@@ -76,15 +62,9 @@ export default function MainForm() {
   };
 
   const handleInterruptTask = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>{
-    e.preventDefault()
-    setState((prevState) => {
-      return {
-        ...prevState,
-        activeTask: null,
-        secondsRemaining: 0,
-        formattedSecondsRemaining: "00:00",
-      };
-    });
+    e.preventDefault();
+    dispachTask({ type: TaskActionType.INTERUPT_TASK });
+
   }
   
   return (
