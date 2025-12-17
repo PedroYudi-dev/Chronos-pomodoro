@@ -4,12 +4,19 @@ export enum TaskActionType {
   START_TASK = "START_TASK",
   INTERUPT_TASK = "INTERRUPT_TASK",
   RESET_TASK = "RESET_TASK",
+  COUNT_DOWN = "COUNT_DOWN",
+  COMPLETE_TASK = "COMPLETE_TASK",
 }
 
-export type TaskActionPayload = {
-  type: TaskActionType.START_TASK;
-  payload: TaskModel;
-}; 
+export type TaskActionPayload =
+  | {
+      type: TaskActionType.START_TASK;
+      payload: TaskModel;
+    }
+  | {
+      type: TaskActionType.COUNT_DOWN;
+      payload: { secondsRemaining : number};
+    }; 
 
 export type TaskActionOutPayload =
   | {
@@ -17,6 +24,9 @@ export type TaskActionOutPayload =
     }
   | {
       type: TaskActionType.INTERUPT_TASK;
+    }
+  | {
+      type: TaskActionType.COMPLETE_TASK;
     };
 
 export type TaskActionModel = TaskActionPayload | TaskActionOutPayload;

@@ -1,3 +1,5 @@
+import type { TaskStateModel } from "../Models/TaskStateModel";
+
 let  instance: TimerWorkeManager | null
 
 // vai ser uma classe que vai gerenciar nosso WORKER
@@ -17,7 +19,7 @@ export class TimerWorkeManager {
     }
 
     // CRIA A MENSAGEM PARA VER SE ESTA EM ANDAMENTO OU NÃO
-    postMessage(message: any){
+    postMessage(message: TaskStateModel){
         this.worker.postMessage(message)
     }
 
