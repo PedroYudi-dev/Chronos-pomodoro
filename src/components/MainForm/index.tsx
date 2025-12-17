@@ -3,22 +3,19 @@ import Cycles from "../Cycles";
 import DefaultButton from "../DefaultButton";
 import { PlayCircleIcon, StopCircleIcon } from "lucide-react";
 import { useRef, useState } from "react";
-import { Snackbar, type AlertColor } from "@mui/material";
-import { Alert } from "../Alert";
 import type { TaskModel } from "../../Models/TaskModel";
 import { useTaskContext } from "../../contexts/TaskContext/useTaskContext";
 import { getNextCycle } from "../../Utils/getNextCycle";
 import { getNextCycleType } from "../../Utils/getNextCycleType";
 import { TaskActionType } from "../../contexts/TaskContext/taskActions";
 import { Tips } from "../Tips";
+import { showMessage } from "../../adapters/shoMessage";
 
 export default function MainForm() {
   const { state, dispachTask } = useTaskContext();
   const [taskName, setTaskName] = useState("");
   const taskNameInput = useRef<HTMLInputElement>(null)
-  const [openSnack, setOpenSnack] = useState(false);
-  const [snackMessage, setSnackMessage] = useState("");
-  const [snackSeverity, setSnackSeverity] = useState<AlertColor>("success");
+ 
 
   const nextCycle = getNextCycle(state.currentCycle)
   const nextCycleType = getNextCycleType(nextCycle);
@@ -26,15 +23,13 @@ export default function MainForm() {
   
   const handleStartNewTask = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    showMessage.dismiss()
     if(!taskNameInput.current || taskNameInput.current === null ) return
 
     const taskNameValue = taskNameInput.current.value.trim();
 
     if (!taskNameValue) {
-      setSnackMessage("Por favor, insira um nome para a tarefa.");
-      setSnackSeverity("error");
-      setOpenSnack(true);
+      showMessage.warn("Por favor, insira um nome para a tarefa.");
       return;
     }
      //else{
@@ -55,16 +50,14 @@ export default function MainForm() {
       type: nextCycleType,
     };
     dispachTask({type: TaskActionType.START_TASK, payload: newTask})
-  };
-
-  const handleCloseSnack = (event: unknown, reason: string) => {
-    if (reason === "clickaway") return;
-    setOpenSnack(false);
+    showMessage.sucess("Tarefa iniciada");
   };
 
   const handleInterruptTask = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>{
     e.preventDefault();
+    showMessage.dismiss()
     dispachTask({ type: TaskActionType.INTERUPT_TASK });
+    showMessage.error("Tarefa  interrompida");
 
   }
   
@@ -114,19 +107,6 @@ export default function MainForm() {
           />
         )}
       </div>
-      <Snackbar
-        open={openSnack}
-        autoHideDuration={6000}
-        onClose={handleCloseSnack}
-      >
-        <Alert
-          onClose={() => setOpenSnack(false)}
-          severity={snackSeverity}
-          sx={{ width: "100%" }}
-        >
-          <p style={{ color: "#fff" }}>{snackMessage}</p>
-        </Alert>
-      </Snackbar>
     </form>
   );
 }
