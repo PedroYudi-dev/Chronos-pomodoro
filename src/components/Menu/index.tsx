@@ -35,7 +35,7 @@ export default function Menu() {
     localStorage.setItem("theme", theme)
   }, [theme])
   return (
-    <div className={styles.menu}>
+    <nav className={styles.menu}>
       <a
         className={styles.menuLink}
         href="#"
@@ -69,6 +69,6 @@ export default function Menu() {
       >
         {nextThemeIcon[theme]}
       </a>
-    </div>
+    </nav>
   ); 
 }
