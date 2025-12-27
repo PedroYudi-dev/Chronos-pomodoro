@@ -36,12 +36,19 @@ export function TaskContextProvaider({ children }: TaskContextProvaider) {
     }
   });
 
+
+  // Title
+  const WindowTitle = `${state.formattedSecondsRemaining} - Chronos Pomodoro Pedo Yudi`
+
   // AQUI O ESTADO TODO MUDA 
   useEffect(() => {
     if (!state.activeTask) {
       // console.log("Worker terminado por falta de tarefa");
       worker.terminate();
     }
+
+    document.title = WindowTitle;
+    
     worker.postMessage(state);
   }, [worker, state]);
 
