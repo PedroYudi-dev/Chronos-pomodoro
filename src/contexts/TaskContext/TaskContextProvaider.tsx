@@ -5,13 +5,27 @@ import { taskReducer } from "./taskReducer";
 import { TimerWorkeManager } from "../../workers/TimerWokerManager";
 import { TaskActionType } from "./taskActions";
 import { loadBeep } from "../../Utils/loadBeep";
+import type { TaskStateModel } from "../../Models/TaskStateModel";
 
 type TaskContextProvaider = {
   children: React.ReactNode;
 };
 
 export function TaskContextProvaider({ children }: TaskContextProvaider) {
-  const [state, dispachTask] = useReducer(taskReducer, initiaTasklState);
+  const [state, dispachTask] = useReducer(taskReducer, initiaTasklState, () => {
+    const storageState = localStorage.getItem("state")
+
+    if(storageState === null) return initiaTasklState
+
+    const parsedStorageState = JSON.parse(storageState) as TaskStateModel
+
+    return {
+      ...parsedStorageState,
+      activeTask: null,
+      secondsRemaining: 0,
+      formattedSecondsRemaining: '00:00',
+    };
+  });
   const playBeepRef = useRef<() => void | null>(null)
 
   // AQUI NÓS COSEGUIMOS UTILIZAR O TEMPO SEM ELE PERDER O TEMPO DELE, POR EXEMPLO SE EU ESTOU EM OUTRA TELA SEM SER A DO CONTADORR
@@ -42,6 +56,7 @@ export function TaskContextProvaider({ children }: TaskContextProvaider) {
 
   // AQUI O ESTADO TODO MUDA 
   useEffect(() => {
+    localStorage.setItem("state", JSON.stringify(state))
     if (!state.activeTask) {
       // console.log("Worker terminado por falta de tarefa");
       worker.terminate();
