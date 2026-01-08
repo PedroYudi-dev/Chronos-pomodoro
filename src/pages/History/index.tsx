@@ -8,12 +8,31 @@ import styles from"./styles.module.css"
 import { useTaskContext } from "../../contexts/TaskContext/useTaskContext";
 import { formatDate } from "../../Utils/formatDate";
 import { getTaskStatus } from "../../Utils/getTaskStatus";
+import { sortTasks, type SortTasksOptions } from "../../Utils/sortTasks";
+import { useState } from "react";
 
 export  function History() {
 
   const {state} = useTaskContext()
-
+  // const sortedTaks = sortTasks({ tasks: state.task });
+  const [sortTasksOptions, setSortTasksOptions] = useState<SortTasksOptions>( () =>{
+    return{
+      tasks: sortTasks({ tasks: state.task }),
+      field: 'startDate',
+      direction: 'desc',
+    }
+  })
     
+  const handleSortTasks = ({field}: Omit<SortTasksOptions, 'tasks' | 'direction' >) => {
+    const newDireciton = sortTasksOptions.direction === 'desc' ? 'asc' : 'desc';
+    
+    setSortTasksOptions({
+      tasks: sortTasks({
+          tasks: sortTasksOptions.tasks,
+          direction: newDireciton,
+          field,})
+    })
+  }
   return (
     <>
       <MainTemplate>
@@ -37,21 +56,36 @@ export  function History() {
               <thead>
                 <tr>
                   {/* Th É O TITULO DO CABEÇALHO */}
-                  <th>Tarefa</th>
-                  <th>Duração</th>
-                  <th>Data</th>
-                  <th>Status</th>
-                  <th>Tipo</th>
+                  <th
+                    className={styles.thSort}
+                    onClick={() => handleSortTasks({ field: "name" })}
+                  >
+                    Tarefa ↕️
+                  </th>
+                  <th
+                    className={styles.thSort}
+                    onClick={() => handleSortTasks({ field: "duration" })}
+                  >
+                    Duração ↕️
+                  </th>
+                  <th
+                    className={styles.thSort}
+                    onClick={() => handleSortTasks({ field: "startDate" })}
+                  >
+                    Data ↕️
+                  </th>
+                  <th className={styles.thSort}>Status ↕️</th>
+                  <th className={styles.thSort}>Tipo ↕️</th>
                 </tr>
               </thead>
 
               <tbody>
-                {state.task.map((task ) =>{
+                {sortTasksOptions.tasks.map((task) => {
                   const taskTypeDictionary = {
                     workTime: "Foco",
                     shortBreakTime: "Pausa Curta",
-                    longBreakTime: "Pausa Longa", 
-                  }
+                    longBreakTime: "Pausa Longa",
+                  };
 
                   return (
                     <tr key={task.id}>
