@@ -9,12 +9,15 @@ import { useTaskContext } from "../../contexts/TaskContext/useTaskContext";
 import { formatDate } from "../../Utils/formatDate";
 import { getTaskStatus } from "../../Utils/getTaskStatus";
 import { sortTasks, type SortTasksOptions } from "../../Utils/sortTasks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { TaskActionType } from "../../contexts/TaskContext/taskActions";
 
 export  function History() {
 
-  const {state} = useTaskContext()
+  const { state, dispachTask } = useTaskContext();
   // const sortedTaks = sortTasks({ tasks: state.task });
+
+  const hasTasks = state.task.length > 0;
   const [sortTasksOptions, setSortTasksOptions] = useState<SortTasksOptions>( () =>{
     return{
       tasks: sortTasks({ tasks: state.task }),
@@ -33,6 +36,20 @@ export  function History() {
           field,})
     })
   }
+
+  const handleResetHistory = () =>{
+    if(!confirm("Tem certeza que deseja apagar o histórico?")) return
+
+    dispachTask({ type: TaskActionType.RESET_TASK });
+  }
+
+  useEffect(() =>{
+    setSortTasksOptions((prevState) => ({
+      ...prevState,
+      tasks: sortTasks({ tasks: state.task, field: prevState.field, direction: prevState.direction }),
+    }))
+  }, [state.task])
+
   return (
     <>
       <MainTemplate>
@@ -40,67 +57,76 @@ export  function History() {
           <Heading>
             <span>History</span>
             <span className={styles.buttonContainer}>
-              <DefaultButton
-                icon={<TrashIcon />}
-                color="red"
-                arial-label="Apagar Histórico"
-                title="Apagar Histórico"
-              />
+                {
+                  hasTasks && (
+                    <DefaultButton
+                    icon={<TrashIcon />}
+                    color="red"
+                    arial-label="Apagar Histórico"
+                    title="Apagar Histórico"
+                    onClick={handleResetHistory}
+                  />
+                  )
+                }
             </span>
           </Heading>
         </Conatainer>
 
         <Conatainer>
-          <div className={styles.resposiveTable}>
-            <table>
-              <thead>
-                <tr>
-                  {/* Th É O TITULO DO CABEÇALHO */}
-                  <th
-                    className={styles.thSort}
-                    onClick={() => handleSortTasks({ field: "name" })}
-                  >
-                    Tarefa ↕️
-                  </th>
-                  <th
-                    className={styles.thSort}
-                    onClick={() => handleSortTasks({ field: "duration" })}
-                  >
-                    Duração ↕️
-                  </th>
-                  <th
-                    className={styles.thSort}
-                    onClick={() => handleSortTasks({ field: "startDate" })}
-                  >
-                    Data ↕️
-                  </th>
-                  <th className={styles.thSort}>Status ↕️</th>
-                  <th className={styles.thSort}>Tipo ↕️</th>
-                </tr>
-              </thead>
+          {hasTasks ? (
+            <div className={styles.resposiveTable}>
+              <table>
+                <thead>
+                  <tr>
+                    {/* Th É O TITULO DO CABEÇALHO */}
+                    <th
+                      className={styles.thSort}
+                      onClick={() => handleSortTasks({ field: "name" })}
+                    >
+                      Tarefa ↕️
+                    </th>
+                    <th
+                      className={styles.thSort}
+                      onClick={() => handleSortTasks({ field: "duration" })}
+                    >
+                      Duração ↕️
+                    </th>
+                    <th
+                      className={styles.thSort}
+                      onClick={() => handleSortTasks({ field: "startDate" })}
+                    >
+                      Data ↕️
+                    </th>
+                    <th className={styles.thSort}>Status ↕️</th>
+                    <th className={styles.thSort}>Tipo ↕️</th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                {sortTasksOptions.tasks.map((task) => {
-                  const taskTypeDictionary = {
-                    workTime: "Foco",
-                    shortBreakTime: "Pausa Curta",
-                    longBreakTime: "Pausa Longa",
-                  };
+                <tbody>
+                  {sortTasksOptions.tasks.map((task) => {
+                    const taskTypeDictionary = {
+                      workTime: "Foco",
+                      shortBreakTime: "Pausa Curta",
+                      longBreakTime: "Pausa Longa",
+                    };
 
-                  return (
-                    <tr key={task.id}>
-                      {/* TD É O CORPO DO CABEÇALHO */}
-                      <td>{task.name}</td>
-                      <td>{task.duration}</td>
-                      <td>{formatDate(task.startDate)}</td>
-                      <td>{getTaskStatus(task, state.activeTask)}</td>
-                      <td>{taskTypeDictionary[task.type]}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                    return (
+                      <tr key={task.id}>
+                        {/* TD É O CORPO DO CABEÇALHO */}
+                        <td>{task.name}</td>
+                        <td>{task.duration}</td>
+                        <td>{formatDate(task.startDate)}</td>
+                        <td>{getTaskStatus(task, state.activeTask)}</td>
+                        <td>{taskTypeDictionary[task.type]}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ): (
+            <p style={{textAlign:"center", fontWeight:"Bold"}}>Aqui não tem nenhuma tarefa</p>
+          )}
         </Conatainer>
       </MainTemplate>
     </>

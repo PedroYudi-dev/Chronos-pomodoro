@@ -1,6 +1,7 @@
 import type { TaskStateModel } from "../../Models/TaskStateModel";
 import { formartSecondsToMinutes } from "../../Utils/formtSecondsToMinutes";
 import { getNextCycle } from "../../Utils/getNextCycle";
+import { initiaTasklState } from "./initialTaskState";
 import { TaskActionType, type TaskActionModel } from "./taskActions";
 
 export function taskReducer(state: TaskStateModel, action: TaskActionModel): TaskStateModel{
@@ -53,7 +54,7 @@ export function taskReducer(state: TaskStateModel, action: TaskActionModel): Tas
         };
       }
       case TaskActionType.RESET_TASK: {
-        return state;
+        return {...initiaTasklState};
       }
     //  AQUI VAI SER CONTADO O TEMPO RESPONSIVAMENTE 
       case TaskActionType.COUNT_DOWN: {
